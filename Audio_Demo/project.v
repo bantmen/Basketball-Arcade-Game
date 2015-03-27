@@ -5,31 +5,39 @@ module project (HEX0, HEX1, HEX2, HEX3, HEX4, HEX5, HEX6, HEX7, LEDR, CLOCK_50, 
 	input [1:0] SW; 
 	input [0:0] GPIO_0;
 	input CLOCK_50;
-	reg output [3:0] SOUND_SELECT; // To be used in DE2_Audio_Example.v
-	output [7:0] SCORE; 	   // Holds MST_g, LSD_g. will be used for lcd inside Audio ex.
+	output reg [3:0] SOUND_SELECT; // To be used in DE2_Audio_Example.v
+	output reg [7:0] SCORE; 	   // Holds MST_g, LSD_g of HI_SCORE. will be used for lcd inside Audio ex.
 	
-	reg [5:0] GOAL, LAST_G_AT;
+	reg [5:0] GOAL, LAST_G_AT, HI_SCORE;
 	wire [5:0] TIMER;
 	wire [3:0] MSD_t, LSD_t, MSD_g, LSD_g;
-		
-	assign SCORE = {MSD_g, LSD_g}; // send to audio which will send to lcd
-	
+			
 	assign LEDR = SW;
 	
 	initial GOAL = 0;
 	initial LAST_G_AT = 60;
 	initial SOUND_SELECT = 4'b1010; // Start sound
 	
+	initial SCORE = 0;
+	initial HI_SCORE = 0;
+	
 	counter C0 (TIMER, CLOCK_50, SW[0], SW[1]);
 	
+	always @ (HI_SCORE)
+		if (HI_SCORE < GOAL) begin
+			HI_SCORE <= GOAL;
+			SCORE = {MSD_g, LSD_g};
+		end
+		
 	always @ (negedge SW[1], negedge GPIO_0)
-		if (~SW[1])
+		if (~SW[1]) begin
 			GOAL <= 0;
 			LAST_G_AT <= 60;
 			if (~SOUND_SELECT)
 				SOUND_SELECT = 4'b1010; // Start sound
 			else
 				SOUND_SELECT = 4'b1000; // Enough start sound
+		end
 		else if (~GPIO_0) begin
 			if ((TIMER != 0) && (LAST_G_AT - TIMER >= 1)) begin
 				GOAL <= GOAL + 1;

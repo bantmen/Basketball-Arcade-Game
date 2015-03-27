@@ -21,7 +21,7 @@ module DE2_Audio_Example (
 	SW,
 	
 	// project stuff
-	HEX0, HEX1, HEX2, HEX3, HEX4, HEX5, HEX6, HEX7, LEDR, GPIO_0
+	HEX0, HEX1, HEX2, HEX3, HEX4, HEX5, HEX6, HEX7, LEDR, GPIO_0,
 	
 	// LCD Stuff
 	GPIO_1, LCD_ON, LCD_BLON, LCD_RW, LCD_EN, LCD_RS, LCD_DATA 
@@ -58,7 +58,7 @@ output				I2C_SCLK;
 // project stuff
 output [6:0] HEX0, HEX1, HEX2, HEX3, HEX4, HEX5, HEX6, HEX7;
 output [1:0] LEDR;
-input [1:0] SW; 
+//input [1:0] SW; 
 input [0:0] GPIO_0;
 
 // LCD Stuff
@@ -82,7 +82,9 @@ wire				write_audio_out;
 
 // Internal Registers
 
-reg [18:0] delay_cnt, delay;
+//reg [18:0] delay_cnt, delay; - Wrong?
+reg [18:0] delay_cnt;
+wire [18:0] delay; // right?
 reg snd;
 
 // State Machine Registers
@@ -107,8 +109,6 @@ always @(posedge CLOCK_50)
  *****************************************************************************/
 //assign delay = {SW[3:0], 15'd3000};
 
-assign delay = {SOUND_SELECT, 15'd3000};
-
 //assign delay = 63775;
 
 //wire [31:0] sound = (SW == 0) ? 0 : snd ? 32'd10000000 : -32'd10000000;
@@ -116,18 +116,19 @@ wire [31:0] sound = (SOUND_SELECT == 0) ? 0 : snd ? 32'd10000000 : -32'd10000000
 
 wire [3:0] SOUND_SELECT;  // project module will handle with this
 wire [7:0] SCORE; // Will get from project
-
 // Initialize the counter and timer
 project p0 (HEX0, HEX1, HEX2, HEX3, HEX4, HEX5, HEX6, HEX7, LEDR, CLOCK_50, GPIO_0, SW, SOUND_SELECT, SCORE);
 
 // LCD Display of Hi-Score
-lcdlab3 L0 (CLOCK_50, KEY, {MSD_g,LSD_g}, GPIO_0, GPIO_1, LCD_ON, LCD_BLON, LCD_RW, LCD_EN, LCD_RS, LCD_DATA);
+lcdlab3 L0 (CLOCK_50, KEY, SCORE, GPIO_0, GPIO_1, LCD_ON, LCD_BLON, LCD_RW, LCD_EN, LCD_RS, LCD_DATA);
 
 assign read_audio_in			= audio_in_available & audio_out_allowed;
 
 assign left_channel_audio_out	= left_channel_audio_in+sound;
 assign right_channel_audio_out	= right_channel_audio_in+sound;
 assign write_audio_out			= audio_in_available & audio_out_allowed;
+
+assign delay = {SOUND_SELECT, 15'd3000};
 
 /*****************************************************************************
  *                              Internal Modules                             *

@@ -281,8 +281,8 @@ reg [7:0] out;
 	5'h06: out <= 8'h72; // r
 	5'h07: out <= 8'h65; // e
 // Line 2 
-	5'h10: <= {4'h0,hex1};
-	5'h11: <= {4'h0,hex0};
+	5'h10: out <= {4'h0,hex1};
+	5'h11: out <= {4'h0,hex0};
 	default: out <= 8'h20; // SP
      endcase
 endmodule
