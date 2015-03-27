@@ -50,7 +50,6 @@ module project (HEX0, HEX1, HEX2, HEX3, HEX4, HEX5, HEX6, HEX7, LEDR, CLOCK_50, 
 	make_blank M1 (HEX3);
 	make_blank M2 (HEX6);
 	make_blank M3 (HEX7);
-
 endmodule
 
 module counter (Q, Clk, SW, Clr);
@@ -77,7 +76,6 @@ module counter (Q, Clk, SW, Clr);
 		end
 		else 
 			i <= i + 1;
-
 endmodule
 
 module bcd_decoder (MSD, LSD, I);
@@ -117,7 +115,5 @@ endmodule
 
 module make_blank(HEX);
 	output [6:0] HEX;
-	
 	assign HEX = 7'b1111111;
-	
 endmodule
