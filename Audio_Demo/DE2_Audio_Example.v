@@ -19,15 +19,17 @@ module DE2_Audio_Example (
 
 	I2C_SCLK,
 	SW,
-	SOUND_SELECT
+	
+	// project stuff
+	HEX0, HEX1, HEX2, HEX3, HEX4, HEX5, HEX6, HEX7, LEDR, GPIO_0
+	
+	// LCD Stuff
+	GPIO_1, LCD_ON, LCD_BLON, LCD_RW, LCD_EN, LCD_RS, LCD_DATA 
 );
 
 /*****************************************************************************
  *                           Parameter Declarations                          *
  *****************************************************************************/
-
-// Initialize the counter and timer
-project p0 (HEX0, HEX1, HEX2, HEX3, HEX4, HEX5, HEX6, HEX7, LEDR, CLOCK_50, GPIO_0, SW, LEDG, SOUND_SELECT);
 
 /*****************************************************************************
  *                             Port Declarations                             *
@@ -53,6 +55,17 @@ output				AUD_DACDAT;
 
 output				I2C_SCLK;
 
+// project stuff
+output [6:0] HEX0, HEX1, HEX2, HEX3, HEX4, HEX5, HEX6, HEX7;
+output [1:0] LEDR;
+input [1:0] SW; 
+input [0:0] GPIO_0;
+
+// LCD Stuff
+input [32:0] GPIO_1;
+output LCD_ON, LCD_BLON, LCD_RW, LCD_EN, LCD_RS;
+inout [7:0] LCD_DATA;
+
 /*****************************************************************************
  *                 Internal Wires and Registers Declarations                 *
  *****************************************************************************/
@@ -66,8 +79,6 @@ wire				audio_out_allowed;
 wire		[31:0]	left_channel_audio_out;
 wire		[31:0]	right_channel_audio_out;
 wire				write_audio_out;
-
-wire [3:0] SOUND_SELECT;
 
 // Internal Registers
 
@@ -103,6 +114,14 @@ assign delay = {SOUND_SELECT, 15'd3000};
 //wire [31:0] sound = (SW == 0) ? 0 : snd ? 32'd10000000 : -32'd10000000;
 wire [31:0] sound = (SOUND_SELECT == 0) ? 0 : snd ? 32'd10000000 : -32'd10000000;
 
+wire [3:0] SOUND_SELECT;  // project module will handle with this
+wire [7:0] SCORE; // Will get from project
+
+// Initialize the counter and timer
+project p0 (HEX0, HEX1, HEX2, HEX3, HEX4, HEX5, HEX6, HEX7, LEDR, CLOCK_50, GPIO_0, SW, SOUND_SELECT, SCORE);
+
+// LCD Display of Hi-Score
+lcdlab3 L0 (CLOCK_50, KEY, {MSD_g,LSD_g}, GPIO_0, GPIO_1, LCD_ON, LCD_BLON, LCD_RW, LCD_EN, LCD_RS, LCD_DATA);
 
 assign read_audio_in			= audio_in_available & audio_out_allowed;
 

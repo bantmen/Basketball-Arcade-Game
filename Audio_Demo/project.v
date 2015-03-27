@@ -1,17 +1,19 @@
-module project (HEX0, HEX1, HEX2, HEX3, HEX4, HEX5, HEX6, HEX7, LEDR, CLOCK_50, GPIO_0, SW, LEDG, SOUND_SELECT);
+module project (HEX0, HEX1, HEX2, HEX3, HEX4, HEX5, HEX6, HEX7, LEDR, CLOCK_50, GPIO_0, 
+				SW, SOUND_SELECT, SCORE);
 	output [6:0] HEX0, HEX1, HEX2, HEX3, HEX4, HEX5, HEX6, HEX7;
 	output [1:0] LEDR;
 	input [1:0] SW; 
 	input [0:0] GPIO_0;
 	input CLOCK_50;
 	reg output [3:0] SOUND_SELECT; // To be used in DE2_Audio_Example.v
-	output [3:0] LEDG;
+	output [7:0] SCORE; 	   // Holds MST_g, LSD_g. will be used for lcd inside Audio ex.
 	
 	reg [5:0] GOAL, LAST_G_AT;
 	wire [5:0] TIMER;
 	wire [3:0] MSD_t, LSD_t, MSD_g, LSD_g;
+		
+	assign SCORE = {MSD_g, LSD_g}; // send to audio which will send to lcd
 	
-	assign LEDG = LSD_g;
 	assign LEDR = SW;
 	
 	initial GOAL = 0;
