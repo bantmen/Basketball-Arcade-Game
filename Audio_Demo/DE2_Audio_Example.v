@@ -18,13 +18,16 @@ module DE2_Audio_Example (
 	AUD_DACDAT,
 
 	I2C_SCLK,
-	SW
+	SW,
+	SOUND_SELECT
 );
 
 /*****************************************************************************
  *                           Parameter Declarations                          *
  *****************************************************************************/
 
+// Initialize the counter and timer
+project p0 (HEX0, HEX1, HEX2, HEX3, HEX4, HEX5, HEX6, HEX7, LEDR, CLOCK_50, GPIO_0, SW, LEDG, SOUND_SELECT);
 
 /*****************************************************************************
  *                             Port Declarations                             *
@@ -33,7 +36,7 @@ module DE2_Audio_Example (
 input				CLOCK_50;
 input				CLOCK_27;
 input		[3:0]	KEY;
-input		[3:0]	SW;
+input		[6:3]	SW;
 
 input				AUD_ADCDAT;
 
@@ -64,6 +67,8 @@ wire		[31:0]	left_channel_audio_out;
 wire		[31:0]	right_channel_audio_out;
 wire				write_audio_out;
 
+wire [3:0] SOUND_SELECT;
+
 // Internal Registers
 
 reg [18:0] delay_cnt, delay;
@@ -89,10 +94,14 @@ always @(posedge CLOCK_50)
 /*****************************************************************************
  *                            Combinational Logic                            *
  *****************************************************************************/
+//assign delay = {SW[3:0], 15'd3000};
 
-assign delay = 63775;
+assign delay = {SOUND_SELECT, 15'd3000};
 
-wire [31:0] sound = (SW == 0) ? 0 : snd ? 32'd10000000 : -32'd10000000;
+//assign delay = 63775;
+
+//wire [31:0] sound = (SW == 0) ? 0 : snd ? 32'd10000000 : -32'd10000000;
+wire [31:0] sound = (SOUND_SELECT == 0) ? 0 : snd ? 32'd10000000 : -32'd10000000;
 
 
 assign read_audio_in			= audio_in_available & audio_out_allowed;
